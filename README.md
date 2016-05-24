@@ -3,9 +3,13 @@ A simple NodeJS boilerplate that demonstrates how to authenticate users against 
 
 This project uses node.  Install it using the commands below.
 
+
 Linux: apt-get install node
+
 OSX: brew install node
+
 Windows: God help you
+
 
 To use this code, clone it and navigate to the projects root directory, where the 'package.json' file is located.  Run 'npm update' to
 install all dependencies specified in package.json.
