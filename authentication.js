@@ -1,113 +1,81 @@
-
-var authenticationModule  = function(app, passport, LocalStrategy, FacebookStrategy) {
+var authenticationModule  = function(app, passport, LocalStrategy, database, passwordHash) {
+    
+    process.stdout.write("Initializing Authentication Module...");
 
     var self = this;
 
-    //calling this function will initialize both local and facebook auth strategies.
     self.initializeAuthentication = function() {
 
-        	console.log("New strategy.");
-
-        //enable passport to use our own local strategy for authenticating users.
+        //specify how you want the Local Strategy to authenticate users.
         passport.use(new LocalStrategy(
-          function(username, password, cb) {        
+            {
+              passReqToCallback: true
+            },
+            function(req, username, password, done) {
+                console.log("REQUEST BODY: ", req.body);
+                console.log("\n\nsearching for user...\n\n");
+                database.fetchFirst("SELECT * FROM User WHERE User.Username = ?", [username], function (userRecord) {
+                    if(! userRecord) { 
+                        //no user found in database.
+                        return done(null, false); 
+                    }
 
-            //replace this async call with an actual call to the db.
-            findByUsername(username, function(err, user) {
+                    if(! validatePassword(userRecord, password)) { 
+                      //user exists, but supplied an incorrect password.
+                      return done(null, false); 
+                    }
 
-                //db has throw a general error. typically means we can't establish connection.
-                if (err) { 
-              	  return cb(err); 
-                }
-
-                //user does not exist.
-                if (!user) { 
-              	  return cb(null, false); 
-                }
-
-                //user exists, but supplied incorrect password.
-                if (user.password != password) { 
-              	  return cb(null, false); 
-                }
-
-                //success, authenticate user
-                return cb(null, user);
-            });
-          }
-        ));    
-
-        //enable passport's own Facebook strategy.  This clientID and client secret are
-        //exclusive to Inukbook.  You'll have to get your own for each app you create.
-        //callbackURL is what facebook will call if you're successfully authenticated.
-        passport.use(new FacebookStrategy({
-            clientID: "1144133222284981",
-            clientSecret: "13d70a2169f997246bc2265532aea25b",
-            //your callback goes below. Using localhost for development.
-            callbackURL: "http://localhost:3000/auth/facebook/callback"
-          },
-          function(accessToken, refreshToken, profile, done) {
-            // placeholder for translating profile into your own custom user object.
-            // for now we will just use the profile object returned by Facebook
-            return done(null, profile);
-          }
-        ));      
-        
-
-        //cb is our callback function.  First argument is err flag, second is info. 
-        //this function is just to be used as an example.  Make a real call to Inukbook db.
-        function findByUsername(username, cb) {
-            var dom = {username: "dominic", password: "password"};        
-
-            if(username === dom.username) {
-              return cb(null, dom);
+                    //credentials correct, serialize this authenticated user.
+                    //all information in 'userRecord' can now be 
+                    //accessed in req.user for all authenticated requests.
+                    return done(null, userRecord);
+                });
             }
-            return cb(null, null);
-        }        
-        
-        
-        // Configure Passport authenticated session persistence.
-        //
-        // In order to restore authentication state across HTTP requests, Passport needs
-        // to serialize users into and deserialize users out of the session.  The
-        // typical implementation of this is as simple as supplying the user ID when
-        // serializing, and querying the user record by ID from the database when
-        // deserializing.        
-        
+        ));
 
-        //facebook serialize and deserialize functions
+        //custom user serialization
         passport.serializeUser(function(user, done) {
-          // placeholder for custom user serialization
-          // first argument is for errors
-          done(null, user);
+            console.log("\n\nSERIALIZATION in progress.\n");
+            console.log("USER: " ,user); 
+            done(null, user); 
         });        
 
+        //custom user deserialization.
+        //first argument is for errors, use as you see fit.
         passport.deserializeUser(function(user, done) {
-          // placeholder for custom user deserialization.
-          // first argument is for errors
-          console.log("\n\n\nde - serialization in progress.\n\n\n");
-          done(null, user);
+            console.log("\n\n\nDE - SERIALIZATION in progress.\n");
+            console.log("USER: " + JSON.stringify(user));
+
+            done(null, user);
         });
 
 
-
-        // Initialize Passport and restore authentication state, if any, from the
-        // session.
+        //Initialize Passport.
         app.use(passport.initialize());
         app.use(passport.session());
 
     };
-
-    // Simple route middleware to ensure user is authenticated.
-    // Use this route middleware on any resource that needs to be protected.  If
-    // the request is authenticated (typically via a persistent login session),
-    // the request will proceed.  Otherwise, the user will be redirected to the
-    // denied page.
+    
+    //middleware to ensure only authenticated users are able to access restricted API endpoints
+    //or perform certain actions. You can write your own similar function that might check
+    //to see that the user is an administrator. 
     self.ensureAuthenticated = function(req, res, next) {
-      if (req.isAuthenticated()) { return next(); }
-      res.redirect('/denied');
+      if (req.isAuthenticated()) {
+          //user is authenticated, allow them to access the requested API endpoint.
+          return next();
+      }
+      //unauthorized, give the client 403 FORBIDDEN
+      res.status(403).send("Not authenticated.");
     };
+
+    //validates user supplied password against hashed password in the database.
+    //returns true on match, false on non-match
+    function validatePassword(userRecord, password) {
+        return passwordHash.verify(password, userRecord.Password);
+    }
+
+    console.log("done.");
 };
 
-//allow this entire file  to be exported to application.js 
+//allow functions in this module to be accessible from other files in this codebase.
 module.exports = authenticationModule;
-
