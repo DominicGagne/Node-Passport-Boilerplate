@@ -52,7 +52,7 @@ authenticationStrategies.initializeAuthentication();
 
 //load and initialize our endpoints module for the API
 var endspointsAPIMoule = require('./endpointsAPI.js');
-var endspointsAPI = new endspointsAPIMoule(app, passport, authenticationStrategies, __dirname);
+var endspointsAPI = new endspointsAPIMoule(app, passport, authenticationStrategies, database, __dirname, passwordHash);
 endspointsAPI.activateEndpoints();
 
 

@@ -17,17 +17,23 @@ var authenticationModule  = function(app, passport, LocalStrategy, database, pas
                 database.fetchFirst("SELECT * FROM User WHERE User.Username = ?", [username], function (userRecord) {
                     if(! userRecord) { 
                         //no user found in database.
+                        console.log("No user found.");
                         return done(null, false); 
                     }
 
                     if(! validatePassword(userRecord, password)) { 
                       //user exists, but supplied an incorrect password.
+                      console.log("User exists, but supplied incorrect password.");
                       return done(null, false); 
                     }
 
                     //credentials correct, serialize this authenticated user.
                     //all information in 'userRecord' can now be 
                     //accessed in req.user for all authenticated requests.
+                    //before doing so, make sure we do not serialize sensitive information.
+                    //userRecord will always stay server side, but there is no need to hold
+                    //onto the user's password, as such we delete it from the object to be serialized.
+                    delete userRecord.Password;
                     return done(null, userRecord);
                 });
             }
@@ -65,7 +71,7 @@ var authenticationModule  = function(app, passport, LocalStrategy, database, pas
           return next();
       }
       //unauthorized, give the client 403 FORBIDDEN
-      res.status(403).send("Not authenticated.");
+      res.status(403).send("<center><h3>Not authenticated.</h3></center>");
     };
 
     //validates user supplied password against hashed password in the database.
