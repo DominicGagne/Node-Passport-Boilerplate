@@ -27,6 +27,8 @@ console.log("\nInitializing application...\n");
 //register our app as an express application
 var app = express();
 
+//set the root directory of the project, required for res.sendFile.
+app.use('/', express.static(__dirname + '/'));
 
 //enable our application to use the body parsing library imported above.
 app.use(bodyParser.json());
@@ -50,7 +52,7 @@ authenticationStrategies.initializeAuthentication();
 
 //load and initialize our endpoints module for the API
 var endspointsAPIMoule = require('./endpointsAPI.js');
-var endspointsAPI = new endspointsAPIMoule(app, passport, authenticationStrategies);
+var endspointsAPI = new endspointsAPIMoule(app, passport, authenticationStrategies, __dirname);
 endspointsAPI.activateEndpoints();
 
 

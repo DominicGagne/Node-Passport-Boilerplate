@@ -2,7 +2,7 @@
 //Such proctected enpoints require a user to be authenticated via our 
 //local strategy in order to gain access to those routes.
 
-var endpointsAPI  = function(app, passport, authenticationStrategies) {
+var endpointsAPI  = function(app, passport, authenticationStrategies, rootDir) {
 
     var self = this;
 
@@ -13,7 +13,7 @@ var endpointsAPI  = function(app, passport, authenticationStrategies) {
         });        
         
         app.get('/', function (req, res) {
-            res.sendFile('Public/index.html');
+            res.sendFile(rootDir + '/Public/index.html');
         });        
         
         //POST /locallogin  TO be used when user submits a form containing information to be validated.
