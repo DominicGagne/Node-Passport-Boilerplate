@@ -9,7 +9,9 @@ var passport = require('passport');
 //within passport, different 'strategies' allow us to authenticate 
 //users in a variety of different manners.
 var LocalStrategy = require('passport-local').Strategy;
-var FacebookStrategy = require('passport-facebook').Strategy;
+
+//will add facebook in the future, just local for now.
+//var FacebookStrategy = require('passport-facebook').Strategy;
 
 //this application will be built on a MySQL Relational Database.
 var mysql = require('mysql');
@@ -21,7 +23,7 @@ var passwordHash = require('password-hash');
 var bodyParser = require('body-parser');
 
 
-process.stdout.write("Initializing application...");
+console.log("\nInitializing application...\n");
 //register our app as an express application
 var app = express();
 
@@ -36,7 +38,7 @@ app.use(require('cookie-parser')());
 app.use(require('express-session')({ secret: 'yours only', resave: false, saveUninitialized: false }));
 
 //load the database module, and allow for connections to be made from the server side code.
-var databaseModule = require('/Database/database.js');
+var databaseModule = require('./Database/database.js');
 var database = new databaseModule(mysql);
 database.acquireConnection();
 
@@ -52,7 +54,7 @@ var endspointsAPI = new endspointsAPIMoule(app, passport, authenticationStrategi
 endspointsAPI.activateEndpoints();
 
 
-console.log("initilization complete.");
+console.log("\nInitilization complete.\n");
 
 //our app is now fully initialized, listen on port 3000 and await a request from the client.
 app.listen(3000, function() {
