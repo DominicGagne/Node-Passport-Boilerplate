@@ -26,7 +26,7 @@ A sample MySQL database creation script has been provided in the **Database** di
 ---
 
 ####Running The Project
-To launch this application, clone it and navigate to the project's root directory, where the 'package.json' file is located.  Run `sudo npm install` to install all dependencies specified in package.json.
+To launch this application, clone it and navigate to the project's root directory, where the **package.json** file is located.  Run `sudo npm install` to install all dependencies specified in package.json.
 
 
 To host the project, run `node application.js`
