@@ -35,10 +35,14 @@ app.use(bodyParser.urlencoded({limit: "5mb", extended: true, parameterLimit:5000
 app.use(require('cookie-parser')());
 app.use(require('express-session')({ secret: 'yours only', resave: false, saveUninitialized: false }));
 
+//load the database module, and allow for connections to be made from the server side code.
+var databaseModule = require('/Database/database.js');
+var database = new databaseModule(mysql);
+database.acquireConnection();
 
 //load and initialize our authentication module
 var authenticatationModule = require('./authentication.js');
-var authenticationStrategies = new authenticatationModule(app, passport, LocalStrategy, database);
+var authenticationStrategies = new authenticatationModule(app, passport, LocalStrategy, database, passwordHash);
 authenticationStrategies.initializeAuthentication();
 
 
