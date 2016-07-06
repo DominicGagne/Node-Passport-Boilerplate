@@ -9,11 +9,15 @@ A simple NodeJS boilerplate that demonstrates how to authenticate users against 
 ####This project uses node.  Install it using the commands below.
 
 
-* Linux: `apt-get install node`
+* Linux: `apt-get install node` or equivalent
 
-* OSX: `brew install node`
+* OSX: `brew install node` or equivalent
 
 * Windows: God help you
+
+Alternatively, you can download an installer or the binaries from the [official NodeJS website].
+
+[official NodeJS website]: https://nodejs.org/en/download/
 
 ---
 
