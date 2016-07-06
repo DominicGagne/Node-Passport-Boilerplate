@@ -45,7 +45,10 @@ var endpointsAPI  = function(app, passport, authenticationStrategies) {
         app.get('/auth/facebook/callback',
           passport.authenticate('facebook', { failureRedirect: '/' }),
           function(req, res) {
-            res.redirect('/');
+            //res.redirect('/');
+
+            ///fuuuuuuck
+            res.send("Success.");
         });        
         
         

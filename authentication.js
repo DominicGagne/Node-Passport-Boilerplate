@@ -40,8 +40,8 @@ var authenticationModule  = function(app, passport, LocalStrategy, FacebookStrat
         //exclusive to Inukbook.  You'll have to get your own for each app you create.
         //callbackURL is what facebook will call if you're successfully authenticated.
         passport.use(new FacebookStrategy({
-            clientID: "your app's client ID goes here.",
-            clientSecret: "your app's client secret goes here.",
+            clientID: "1144133222284981",
+            clientSecret: "13d70a2169f997246bc2265532aea25b",
             //your callback goes below. Using localhost for development.
             callbackURL: "http://localhost:3000/auth/facebook/callback"
           },
